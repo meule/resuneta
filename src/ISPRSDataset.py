@@ -75,25 +75,33 @@ class ISPRSDataset(dataset.Dataset):
         mask = t['mask']
         mask = mask.astype(np.float32)
         
-
         if self.color:
             mask = np.concatenate([mask,base_hsv],axis=0)
         
         if self.mtsk == False:
             mask = mask[:6,:,:] 
 
+        all_count = np.prod(mask.shape)
+        fg_count = np.count_nonzero(mask)
+        bg_count = all_count - fg_count
+        alpha = 1. / fg_count
+        beta = 1. / bg_count
+        alpha = alpha / (alpha + beta)
+        beta = beta / (alpha + beta)        
+        weight = mask * alpha + (1 - mask) * beta
+            
         if self._transform is not None:
             base, mask = self._transform(base, mask)
             if self._norm is not None:
                 base = self._norm(base.astype(np.float32))
 
-            return base.astype(np.float32), mask.astype(np.float32)
+            return base.astype(np.float32), mask.astype(np.float32), weight
             
         else:
             if self._norm is not None:
                 base = self._norm(base.astype(np.float32))
 
-            return base.astype(np.float32), mask.astype(np.float32)
+            return base.astype(np.float32), mask.astype(np.float32), weight
 
     def __len__(self):
         return len(self.img_names)
