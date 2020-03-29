@@ -50,9 +50,7 @@ class ISPRSDataset(dataset.Dataset):
                 
         self._img_list = sorted(os.listdir(self._root_img))
         #self._mask_list = sorted(os.listdir(self._root_mask))
-        
-        #assert len(self._img_list) == len(self._mask_list), "Masks and labels do not have same numbers, error"
-        
+                
         #self.img_names = list(zip(self._img_list, self._mask_list))
         self.img_names = list(zip(self._img_list))
     
