@@ -39,30 +39,32 @@ class ISPRSDataset(dataset.Dataset):
 
         if mode is 'train':
             self._root_img  = self._root_train + r'imgs/'
-            self._root_mask = self._root_train + r'masks/'
+            #self._root_mask = self._root_train + r'masks/'
         elif mode is 'val':
             self._root_img  = self._root_valid + r'imgs/'
-            self._root_mask = self._root_valid + r'masks/'
+            #self._root_mask = self._root_valid + r'masks/'
         else:
             raise Exception ('I was given inconcistent mode, available choices: {train, val}, aborting ...')
 
 
                 
         self._img_list = sorted(os.listdir(self._root_img))
-        self._mask_list = sorted(os.listdir(self._root_mask))
+        #self._mask_list = sorted(os.listdir(self._root_mask))
         
-        assert len(self._img_list) == len(self._mask_list), "Masks and labels do not have same numbers, error"
+        #assert len(self._img_list) == len(self._mask_list), "Masks and labels do not have same numbers, error"
         
-        self.img_names = list(zip(self._img_list, self._mask_list))
+        #self.img_names = list(zip(self._img_list, self._mask_list))
+        self.img_names = list(zip(self._img_list))
     
 
     def __getitem__(self, idx):
                 
         base_filepath = os.path.join(self._root_img, self.img_names[idx][0])
-        mask_filepath = os.path.join(self._root_mask, self.img_names[idx][1])
+        #mask_filepath = os.path.join(self._root_mask, self.img_names[idx][1])
         
+        t = np.load(base_filepath) 
         # load in float32
-        base = np.load(base_filepath) 
+        base = t['img']
         if self.color:
             timg = base.transpose([1,2,0])[:,:,:3].astype(np.uint8)
             base_hsv = cv2.cvtColor(timg,cv2.COLOR_RGB2HSV)
@@ -72,7 +74,7 @@ class ISPRSDataset(dataset.Dataset):
         
         base = base.astype(np.float32) 
 
-        mask = np.load(mask_filepath) 
+        mask = t['mask']
         mask = mask.astype(np.float32)
         
 
